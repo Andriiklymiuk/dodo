@@ -15,7 +15,7 @@ export {
 } from 'expo-router'
 
 export const unstable_settings = {
-  initialRouteName: 'todo',
+
 }
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -48,7 +48,7 @@ function RootLayoutNav() {
     <TamaguiProvider config={config} defaultTheme={colorScheme as any}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
-          <Stack.Screen name="todo" options={{ headerShown: true }} />
+          <Stack.Screen name="index" options={{ headerShown: true, headerTitle: '🗒️' }} />
         </Stack>
       </ThemeProvider>
     </TamaguiProvider>
