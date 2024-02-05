@@ -27,13 +27,16 @@ const CheckboxWithLabel = ({
 
   return (
     <>
-      <XStack width={300} alignItems="center" space="$4" onPress={openSheet}>
-        <Checkbox {...checkboxProps}>
+      <XStack width={300} alignItems="center" space="$4" onLongPress={openSheet}>
+        <Checkbox
+          {...checkboxProps}
+          checked={checkboxProps.checked}
+        >
           <Checkbox.Indicator>
             <Check />
           </Checkbox.Indicator>
         </Checkbox>
-        <Label size="$4" onPress={openSheet}>
+        <Label size="$4" onLongPress={openSheet}>
           {label}
         </Label>
       </XStack>

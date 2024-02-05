@@ -15,6 +15,7 @@ import {
   Sheet,
   Label
 } from 'tamagui';
+import { X } from '@tamagui/lucide-icons';
 import CheckboxWithLabel, { CheckboxWithLabelProps } from './components/CheckboxWithLabel';
 
 export default function TabOneScreen() {
@@ -23,16 +24,30 @@ export default function TabOneScreen() {
   const [isSheetVisible, setIsSheetVisible] = useState(false);
   const [chosenTodo, setChosenTodo] = useState<CheckboxWithLabelProps | undefined>(undefined);
 
-
-  const closeSheet = () => { setIsSheetVisible(false); }
+  const closeSheet = () => {
+    setIsSheetVisible(false);
+    setChosenTodo(undefined);
+    setNewLabel('');
+  }
 
   const openSheet = (id: string) => {
-
     const todo = checkboxes.find(checkbox => checkbox.id === id);
     if (todo) {
       setChosenTodo(todo);
       setIsSheetVisible(true);
     }
+  }
+
+  const onEditTodo = () => {
+    if (chosenTodo) {
+      setNewLabel(chosenTodo.label);
+      setIsSheetVisible(false);
+    }
+  }
+
+  const closeEdit = () => {
+    setChosenTodo(undefined);
+    setNewLabel('');
   }
 
   const onDeleteTodo = (id: string) => {
@@ -42,14 +57,30 @@ export default function TabOneScreen() {
 
   const addCheckbox = () => {
     if (newLabel.trim() === '') return;
-    const newId = Date.now().toString();
-    setCheckboxes([...checkboxes, {
-      id: newId,
-      label: newLabel,
-      checked: false,
-      disabled: false
-    }]);
+    if (chosenTodo) {
+      const updatedCheckboxes = checkboxes.map(checkbox => {
+        if (checkbox.id === chosenTodo.id) {
+          return { ...checkbox, label: newLabel };
+        }
+        return checkbox;
+      });
+      setCheckboxes(updatedCheckboxes);
+      closeEdit();
+    } else {
+      const newId = Date.now().toString();
+      setCheckboxes([...checkboxes, {
+        id: newId,
+        label: newLabel,
+        checked: false,
+        disabled: false
+      }]);
+      setNewLabel('');
+    }
+  };
+
+  const cancelEdit = () => {
     setNewLabel('');
+    setChosenTodo(undefined);
   };
 
   const renderCheckbox = ({ item }: { item: any }) => (
@@ -59,9 +90,7 @@ export default function TabOneScreen() {
       defaultChecked={item.checked}
       disabled={item.disabled}
       onDelete={onDeleteTodo}
-      onModalPressed={(id) => {
-        openSheet(id);
-      }}
+      onModalPressed={openSheet}
     />
   );
 
@@ -72,7 +101,6 @@ export default function TabOneScreen() {
       keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 20}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-
         <View flex={1} alignItems="center">
           <YStack paddingBottom="$10" flex={1} width={300} space="$2">
             <FlatList
@@ -81,25 +109,36 @@ export default function TabOneScreen() {
               keyExtractor={item => item.id}
               contentContainerStyle={{ marginBottom: 100, alignItems: 'center' }}
             />
+            {chosenTodo && (
+              <Button onPress={cancelEdit} color="$b" icon={<X size="$1" />}>
+                Cancel editing
+              </Button>
+            )}
             <XStack space="$2" alignItems="flex-end" marginBottom="$10">
               <Input
                 flex={1}
-                placeholder="Add new TODO"
+                placeholder={chosenTodo ? "Edit TODO" : "Add new TODO"}
                 value={newLabel}
                 keyboardType="default"
                 autoCorrect={false}
                 onSubmitEditing={addCheckbox}
                 onChange={(e) => setNewLabel(e.nativeEvent.text)}
               />
-              <Button onPress={addCheckbox}>
-                Add
+              <Button onPress={addCheckbox} theme="active">
+                {chosenTodo ? "Update" : "Add"}
               </Button>
             </XStack>
           </YStack>
           {chosenTodo &&
             <Sheet open={isSheetVisible} onOpenChange={setIsSheetVisible}>
+              <Sheet.Overlay
+                animation="lazy"
+                enterStyle={{ opacity: 0 }}
+                exitStyle={{ opacity: 0 }}
+              />
               <YStack padding="$4" marginTop="$4" space="$2">
                 <Label size="$4">{chosenTodo.label}</Label>
+                <Button size="$4" onPress={onEditTodo}>Edit</Button>
                 <Button size="$4" onPress={() => onDeleteTodo(chosenTodo.id)}>Delete</Button>
                 <Button size="$4" onPress={closeSheet}>Cancel</Button>
               </YStack>
