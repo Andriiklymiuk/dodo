@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { FlatList, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from 'react-native';
 import { Check } from '@tamagui/lucide-icons';
-import { Button, Checkbox, CheckboxProps, Input, Label, SizeTokens, View, XStack, YStack } from 'tamagui';
+import { Button, Checkbox, CheckboxProps, Input, Label, Sheet, SizeTokens, View, XStack, YStack } from 'tamagui';
 
 
 export interface CheckboxWithLabelProps {
@@ -15,24 +14,30 @@ const CheckboxWithLabel = ({
   id,
   label,
   onDelete,
+  onModalPressed,
   ...checkboxProps
-}: CheckboxProps & { size?: SizeTokens; label?: string; id: string; onDelete: (id: string) => void }) => {
-  const onLongPress = () => {
-    onDelete(id);
-  };
+}: CheckboxProps & {
+  size?: SizeTokens;
+  label?: string;
+  id: string;
+  onDelete: (id: any) => void;
+  onModalPressed: (id: any) => void;
+}) => {
+  const openSheet = () => onModalPressed(id);
 
   return (
-    <XStack width={300} alignItems="center" space="$4" onLongPress={onLongPress}>
-      <Checkbox {...checkboxProps}>
-        <Checkbox.Indicator>
-          <Check />
-        </Checkbox.Indicator>
-      </Checkbox>
-
-      <Label size="$4" htmlFor={id} onLongPress={onLongPress}>
-        {label}
-      </Label>
-    </XStack>
+    <>
+      <XStack width={300} alignItems="center" space="$4" onPress={openSheet}>
+        <Checkbox {...checkboxProps}>
+          <Checkbox.Indicator>
+            <Check />
+          </Checkbox.Indicator>
+        </Checkbox>
+        <Label size="$4" onPress={openSheet}>
+          {label}
+        </Label>
+      </XStack>
+    </>
   );
 };
 

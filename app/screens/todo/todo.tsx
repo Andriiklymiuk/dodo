@@ -11,16 +11,33 @@ import {
   Input,
   View,
   XStack,
-  YStack
+  YStack,
+  Sheet,
+  Label
 } from 'tamagui';
 import CheckboxWithLabel, { CheckboxWithLabelProps } from './components/CheckboxWithLabel';
 
 export default function TabOneScreen() {
   const [checkboxes, setCheckboxes] = useState<CheckboxWithLabelProps[]>([]);
   const [newLabel, setNewLabel] = useState('');
+  const [isSheetVisible, setIsSheetVisible] = useState(false);
+  const [chosenTodo, setChosenTodo] = useState<CheckboxWithLabelProps | undefined>(undefined);
 
-  const deleteCheckbox = (id: string) => {
+
+  const closeSheet = () => { setIsSheetVisible(false); }
+
+  const openSheet = (id: string) => {
+
+    const todo = checkboxes.find(checkbox => checkbox.id === id);
+    if (todo) {
+      setChosenTodo(todo);
+      setIsSheetVisible(true);
+    }
+  }
+
+  const onDeleteTodo = (id: string) => {
     setCheckboxes(checkboxes.filter(checkbox => checkbox.id !== id));
+    closeSheet();
   };
 
   const addCheckbox = () => {
@@ -41,7 +58,10 @@ export default function TabOneScreen() {
       label={item.label}
       defaultChecked={item.checked}
       disabled={item.disabled}
-      onDelete={deleteCheckbox}
+      onDelete={onDeleteTodo}
+      onModalPressed={(id) => {
+        openSheet(id);
+      }}
     />
   );
 
@@ -76,6 +96,15 @@ export default function TabOneScreen() {
               </Button>
             </XStack>
           </YStack>
+          {chosenTodo &&
+            <Sheet open={isSheetVisible} onOpenChange={setIsSheetVisible}>
+              <YStack padding="$4" marginTop="$4" space="$2">
+                <Label size="$4">{chosenTodo.label}</Label>
+                <Button size="$4" onPress={() => onDeleteTodo(chosenTodo.id)}>Delete</Button>
+                <Button size="$4" onPress={closeSheet}>Cancel</Button>
+              </YStack>
+            </Sheet>
+          }
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
