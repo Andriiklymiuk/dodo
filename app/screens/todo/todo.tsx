@@ -1,6 +1,18 @@
 import React, { useState } from 'react';
-import { FlatList, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from 'react-native';
-import { Button, Input, View, XStack, YStack } from 'tamagui';
+import {
+  FlatList,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback
+} from 'react-native';
+import {
+  Button,
+  Input,
+  View,
+  XStack,
+  YStack
+} from 'tamagui';
 import CheckboxWithLabel, { CheckboxWithLabelProps } from './components/CheckboxWithLabel';
 
 export default function TabOneScreen() {
