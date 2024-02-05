@@ -13,34 +13,41 @@ export interface CheckboxWithLabelProps {
 const CheckboxWithLabel = ({
   id,
   label,
-  onDelete,
   onModalPressed,
+  onCheckPressed,
   ...checkboxProps
 }: CheckboxProps & {
   size?: SizeTokens;
   label?: string;
   id: string;
-  onDelete: (id: any) => void;
   onModalPressed: (id: any) => void;
+  onCheckPressed: (id: any) => void;
 }) => {
-  const openSheet = () => onModalPressed(id);
+  const handleCheckedChange = (checked: boolean) => {
+    onCheckPressed(id);
+  };
 
   return (
-    <>
-      <XStack width={300} alignItems="center" space="$4" onLongPress={openSheet}>
-        <Checkbox
-          {...checkboxProps}
-          checked={checkboxProps.checked}
-        >
-          <Checkbox.Indicator>
-            <Check />
-          </Checkbox.Indicator>
-        </Checkbox>
-        <Label size="$4" onLongPress={openSheet}>
-          {label}
-        </Label>
-      </XStack>
-    </>
+    <XStack width={300} alignItems="center" space="$4"
+      onLongPress={() => onModalPressed(id)}
+      onPress={() => onCheckPressed(id)}
+    >
+      <Checkbox
+        {...checkboxProps}
+        onCheckedChange={handleCheckedChange}
+      >
+        <Checkbox.Indicator>
+          <Check />
+        </Checkbox.Indicator>
+      </Checkbox>
+      <Label
+        size="$4"
+        onLongPress={() => onModalPressed(id)}
+        onPress={() => onCheckPressed(id)}
+      >
+        {label}
+      </Label>
+    </XStack>
   );
 };
 

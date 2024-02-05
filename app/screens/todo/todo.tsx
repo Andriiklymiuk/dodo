@@ -83,14 +83,25 @@ export default function TabOneScreen() {
     setChosenTodo(undefined);
   };
 
+  const onCheckPressed = (id: string) => {
+    const updatedCheckboxes = checkboxes.map(checkbox => {
+      if (checkbox.id === id) {
+        return { ...checkbox, checked: !checkbox.checked };
+      }
+      return checkbox;
+    });
+    setCheckboxes(updatedCheckboxes);
+  }
+
   const renderCheckbox = ({ item }: { item: any }) => (
     <CheckboxWithLabel
       id={item.id}
       label={item.label}
+      checked={item.checked}
       defaultChecked={item.checked}
       disabled={item.disabled}
-      onDelete={onDeleteTodo}
       onModalPressed={openSheet}
+      onCheckPressed={onCheckPressed}
     />
   );
 
