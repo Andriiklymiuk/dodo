@@ -8,6 +8,8 @@ import { TamaguiProvider } from 'tamagui'
 import { config } from '../tamagui.config'
 import { useFonts } from 'expo-font'
 import { useEffect } from 'react'
+import { Provider } from 'react-redux'
+import { store } from './services/store'
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -45,12 +47,14 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme()
 
   return (
-    <TamaguiProvider config={config} defaultTheme={colorScheme as any}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: true, headerTitle: '🗒️' }} />
-        </Stack>
-      </ThemeProvider>
-    </TamaguiProvider>
+    <Provider store={store}>
+      <TamaguiProvider config={config} defaultTheme={colorScheme as any}>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="index" options={{ headerShown: true, headerTitle: '🗒️' }} />
+          </Stack>
+        </ThemeProvider>
+      </TamaguiProvider>
+    </Provider>
   )
 }

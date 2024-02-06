@@ -1,16 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Check } from '@tamagui/lucide-icons';
-import { Button, Checkbox, CheckboxProps, Input, Label, Sheet, SizeTokens, View, XStack, YStack } from 'tamagui';
+import { Checkbox, CheckboxProps, Label, SizeTokens, XStack, } from 'tamagui';
 
-
-export interface CheckboxWithLabelProps {
-  id: string;
-  label: string;
-  checked: boolean;
-  disabled: boolean;
-}
-
-const CheckboxWithLabel = ({
+const TodoWithLabel = ({
   id,
   label,
   onModalPressed,
@@ -23,9 +15,6 @@ const CheckboxWithLabel = ({
   onModalPressed: (id: any) => void;
   onCheckPressed: (id: any) => void;
 }) => {
-  const handleCheckedChange = (checked: boolean) => {
-    onCheckPressed(id);
-  };
 
   return (
     <XStack width={300} alignItems="center" space="$4"
@@ -34,7 +23,7 @@ const CheckboxWithLabel = ({
     >
       <Checkbox
         {...checkboxProps}
-        onCheckedChange={handleCheckedChange}
+        onCheckedChange={() => onCheckPressed(id)}
       >
         <Checkbox.Indicator>
           <Check />
@@ -52,4 +41,4 @@ const CheckboxWithLabel = ({
   );
 };
 
-export default CheckboxWithLabel;
+export default TodoWithLabel;

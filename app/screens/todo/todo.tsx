@@ -14,16 +14,21 @@ import {
   YStack,
   Sheet,
   Label,
-  TextArea
+  TextArea,
 } from 'tamagui';
 import { Check, Plus, X } from '@tamagui/lucide-icons';
-import CheckboxWithLabel, { CheckboxWithLabelProps } from './components/CheckboxWithLabel';
+import TodoWithLabel from './components/TodoWithLabel';
+import { TodoItem, addTodo, removeTodo, toggleTodo, updateTodo } from './reducer';
+import { RootState } from '../../services/store';
+import { useDispatch, useSelector } from 'react-redux';
 
-export default function TabOneScreen() {
-  const [checkboxes, setCheckboxes] = useState<CheckboxWithLabelProps[]>([]);
+export default function TodoScreen() {
+  const dispatch = useDispatch();
+
   const [newLabel, setNewLabel] = useState('');
   const [isSheetVisible, setIsSheetVisible] = useState(false);
-  const [chosenTodo, setChosenTodo] = useState<CheckboxWithLabelProps | undefined>(undefined);
+  const [chosenTodo, setChosenTodo] = useState<TodoItem | undefined>(undefined);
+  const todos = useSelector((state: RootState) => state.todos.todos);
 
   const closeSheet = () => {
     setIsSheetVisible(false);
@@ -32,7 +37,7 @@ export default function TabOneScreen() {
   }
 
   const openSheet = (id: string) => {
-    const todo = checkboxes.find(checkbox => checkbox.id === id);
+    const todo = todos.find(todo => todo.id === id);
     if (todo) {
       setChosenTodo(todo);
       setIsSheetVisible(true);
@@ -52,31 +57,29 @@ export default function TabOneScreen() {
   }
 
   const onDeleteTodo = (id: string) => {
-    setCheckboxes(checkboxes.filter(checkbox => checkbox.id !== id));
+    dispatch(removeTodo(id));
     closeSheet();
   };
 
-  const addCheckbox = () => {
+  const onSubmitTodo = () => {
     if (newLabel.trim() === '') return;
     if (chosenTodo) {
-      const updatedCheckboxes = checkboxes.map(checkbox => {
-        if (checkbox.id === chosenTodo.id) {
-          return { ...checkbox, label: newLabel };
-        }
-        return checkbox;
-      });
-      setCheckboxes(updatedCheckboxes);
+      dispatch(updateTodo({
+        id: chosenTodo.id,
+        label: newLabel
+      }));
       closeEdit();
-    } else {
-      const newId = Date.now().toString();
-      setCheckboxes([...checkboxes, {
-        id: newId,
-        label: newLabel,
-        checked: false,
-        disabled: false
-      }]);
-      setNewLabel('');
+      return;
     }
+
+    const newTodo: TodoItem = {
+      id: Date.now().toString(),
+      label: newLabel,
+      checked: false,
+      disabled: false,
+    };
+    dispatch(addTodo(newTodo))
+    setNewLabel('');
   };
 
   const cancelEdit = () => {
@@ -85,17 +88,11 @@ export default function TabOneScreen() {
   };
 
   const onCheckPressed = (id: string) => {
-    const updatedCheckboxes = checkboxes.map(checkbox => {
-      if (checkbox.id === id) {
-        return { ...checkbox, checked: !checkbox.checked };
-      }
-      return checkbox;
-    });
-    setCheckboxes(updatedCheckboxes);
+    dispatch(toggleTodo(id));
   }
 
-  const renderCheckbox = ({ item }: { item: any }) => (
-    <CheckboxWithLabel
+  const renderTodo = ({ item }: { item: any }) => (
+    <TodoWithLabel
       id={item.id}
       label={item.label}
       checked={item.checked}
@@ -120,8 +117,8 @@ export default function TabOneScreen() {
         <View flex={1} alignItems="center">
           <YStack paddingBottom="$10" flex={1} width={300} gap="$2">
             <FlatList
-              data={checkboxes}
-              renderItem={renderCheckbox}
+              data={todos}
+              renderItem={renderTodo}
               keyExtractor={item => item.id}
               contentContainerStyle={{ marginBottom: 100, alignItems: 'center' }}
             />
@@ -134,7 +131,7 @@ export default function TabOneScreen() {
                   value={newLabel}
                   keyboardType="default"
                   autoCorrect={false}
-                  onSubmitEditing={addCheckbox}
+                  onSubmitEditing={onSubmitTodo}
                   onChange={(e) => setNewLabel(e.nativeEvent.text)}
                 />
               }
@@ -145,7 +142,7 @@ export default function TabOneScreen() {
                   value={newLabel}
                   keyboardType="default"
                   autoCorrect={false}
-                  onSubmitEditing={addCheckbox}
+                  onSubmitEditing={onSubmitTodo}
                   onChange={(e) => setNewLabel(e.nativeEvent.text)}
                 />
               }
@@ -163,7 +160,7 @@ export default function TabOneScreen() {
                   icon={
                     chosenTodo ? <Check size="$1" /> : <Plus size="$1" />
                   }
-                  onPress={addCheckbox}
+                  onPress={onSubmitTodo}
                 />
               </YStack>
             </XStack>
