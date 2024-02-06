@@ -118,7 +118,7 @@ export default function TabOneScreen() {
         accessible={false}
       >
         <View flex={1} alignItems="center">
-          <YStack paddingBottom="$10" flex={1} width={300} space="$2">
+          <YStack paddingBottom="$10" flex={1} width={300} gap="$2">
             <FlatList
               data={checkboxes}
               renderItem={renderCheckbox}
@@ -126,7 +126,7 @@ export default function TabOneScreen() {
               contentContainerStyle={{ marginBottom: 100, alignItems: 'center' }}
             />
 
-            <XStack space="$2" alignItems="flex-end" marginBottom="$10">
+            <XStack gap="$2" alignItems="flex-end" marginBottom="$10">
               {chosenTodo &&
                 <TextArea
                   flex={1}
@@ -149,7 +149,7 @@ export default function TabOneScreen() {
                   onChange={(e) => setNewLabel(e.nativeEvent.text)}
                 />
               }
-              <YStack space="$2" width="$4">
+              <YStack gap="$2" width="$4">
                 {chosenTodo && (
                   <Button
                     color="$b"
@@ -169,25 +169,35 @@ export default function TabOneScreen() {
             </XStack>
           </YStack>
           {chosenTodo &&
-            <Sheet open={isSheetVisible} onOpenChange={setIsSheetVisible}>
+            <Sheet
+              open={isSheetVisible}
+              snapPointsMode="fit"
+              onOpenChange={setIsSheetVisible}>
               <Sheet.Overlay
                 animation="lazy"
                 enterStyle={{ opacity: 0 }}
                 exitStyle={{ opacity: 0 }}
               />
-              <YStack
-                padding="$4"
-                marginTop="$4"
-                space="$2"
-                maxWidth={300}
-                minWidth={200}
-                alignSelf='center'
+              <Sheet.Frame
+                ai="center"
+                jc="center"
+                paddingBottom="$4"
               >
-                <Label size="$4">{chosenTodo.label}</Label>
-                <Button size="$4" onPress={onEditTodo}>Edit</Button>
-                <Button size="$4" onPress={() => onDeleteTodo(chosenTodo.id)}>Delete</Button>
-                <Button size="$4" onPress={closeSheet}>Cancel</Button>
-              </YStack>
+
+                <YStack
+                  padding="$4"
+                  marginTop="$4"
+                  gap="$2"
+                  maxWidth={300}
+                  minWidth={200}
+                  alignSelf='center'
+                >
+                  <Label size="$4">{chosenTodo.label}</Label>
+                  <Button size="$4" onPress={onEditTodo}>Edit</Button>
+                  <Button size="$4" onPress={() => onDeleteTodo(chosenTodo.id)}>Delete</Button>
+                  <Button theme="red" size="$4" onPress={closeSheet}>Cancel</Button>
+                </YStack>
+              </Sheet.Frame>
             </Sheet>
           }
         </View>
