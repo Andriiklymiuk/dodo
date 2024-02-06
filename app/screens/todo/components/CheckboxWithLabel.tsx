@@ -42,6 +42,7 @@ const CheckboxWithLabel = ({
       </Checkbox>
       <Label
         size="$4"
+        numberOfLines={2}
         onLongPress={() => onModalPressed(id)}
         onPress={() => onCheckPressed(id)}
       >

@@ -4,7 +4,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback
+  Pressable
 } from 'react-native';
 import {
   Button,
@@ -111,7 +111,11 @@ export default function TabOneScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 20}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <Pressable
+        style={{ flex: 1 }}
+        onPress={Platform.OS !== 'web' ? Keyboard.dismiss : () => null}
+        accessible={false}
+      >
         <View flex={1} alignItems="center">
           <YStack paddingBottom="$10" flex={1} width={300} space="$2">
             <FlatList
@@ -147,7 +151,14 @@ export default function TabOneScreen() {
                 enterStyle={{ opacity: 0 }}
                 exitStyle={{ opacity: 0 }}
               />
-              <YStack padding="$4" marginTop="$4" space="$2">
+              <YStack
+                padding="$4"
+                marginTop="$4"
+                space="$2"
+                maxWidth={300}
+                minWidth={200}
+                alignSelf='center'
+              >
                 <Label size="$4">{chosenTodo.label}</Label>
                 <Button size="$4" onPress={onEditTodo}>Edit</Button>
                 <Button size="$4" onPress={() => onDeleteTodo(chosenTodo.id)}>Delete</Button>
@@ -156,7 +167,7 @@ export default function TabOneScreen() {
             </Sheet>
           }
         </View>
-      </TouchableWithoutFeedback>
+      </Pressable>
     </KeyboardAvoidingView>
   );
 }
