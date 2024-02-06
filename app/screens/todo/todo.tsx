@@ -13,9 +13,10 @@ import {
   XStack,
   YStack,
   Sheet,
-  Label
+  Label,
+  TextArea
 } from 'tamagui';
-import { X } from '@tamagui/lucide-icons';
+import { Check, Plus, X } from '@tamagui/lucide-icons';
 import CheckboxWithLabel, { CheckboxWithLabelProps } from './components/CheckboxWithLabel';
 
 export default function TabOneScreen() {
@@ -124,24 +125,47 @@ export default function TabOneScreen() {
               keyExtractor={item => item.id}
               contentContainerStyle={{ marginBottom: 100, alignItems: 'center' }}
             />
-            {chosenTodo && (
-              <Button onPress={cancelEdit} color="$b" icon={<X size="$1" />}>
-                Cancel editing
-              </Button>
-            )}
+
             <XStack space="$2" alignItems="flex-end" marginBottom="$10">
-              <Input
-                flex={1}
-                placeholder={chosenTodo ? "Edit TODO" : "Add new TODO"}
-                value={newLabel}
-                keyboardType="default"
-                autoCorrect={false}
-                onSubmitEditing={addCheckbox}
-                onChange={(e) => setNewLabel(e.nativeEvent.text)}
-              />
-              <Button onPress={addCheckbox} theme="active">
-                {chosenTodo ? "Update" : "Add"}
-              </Button>
+              {chosenTodo &&
+                <TextArea
+                  flex={1}
+                  placeholder={chosenTodo ? "Edit TODO" : "Add new TODO"}
+                  value={newLabel}
+                  keyboardType="default"
+                  autoCorrect={false}
+                  onSubmitEditing={addCheckbox}
+                  onChange={(e) => setNewLabel(e.nativeEvent.text)}
+                />
+              }
+              {!chosenTodo &&
+                <Input
+                  flex={1}
+                  placeholder={chosenTodo ? "Edit TODO" : "Add new TODO"}
+                  value={newLabel}
+                  keyboardType="default"
+                  autoCorrect={false}
+                  onSubmitEditing={addCheckbox}
+                  onChange={(e) => setNewLabel(e.nativeEvent.text)}
+                />
+              }
+              <YStack space="$2" width="$4">
+                {chosenTodo && (
+                  <Button
+                    color="$b"
+                    icon={<X size="$1" />}
+                    onPress={cancelEdit}
+                  />
+                )}
+                <Button
+                  size={chosenTodo ? "$4" : "$4"}
+                  theme="active"
+                  icon={
+                    chosenTodo ? <Check size="$1" /> : <Plus size="$1" />
+                  }
+                  onPress={addCheckbox}
+                />
+              </YStack>
             </XStack>
           </YStack>
           {chosenTodo &&
