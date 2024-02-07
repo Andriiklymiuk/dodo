@@ -69,7 +69,7 @@ export default function TodoScreen() {
   }
 
   const onDeleteTodo = async (id: string) => {
-    await deleteTodo(id).unwrap().catch((e) => console.error(e));
+    await deleteTodo(id).unwrap();
     closeSheet();
   };
 
