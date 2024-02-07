@@ -26,10 +26,15 @@ import {
   X
 } from '@tamagui/lucide-icons';
 import TodoWithLabel from './components/TodoWithLabel';
-import { todosApi, useDeleteTodoMutation, useGetTodosQuery, usePostTodoMutation, useToggleTodoMutation, useUpdateTodoMutation } from './api';
+import {
+  useDeleteTodoMutation,
+  useGetTodosQuery,
+  usePostTodoMutation,
+  useToggleTodoMutation,
+  useUpdateTodoMutation
+} from './api';
 import { TodoItem } from './types';
-import { RootState } from '../../services/store';
-import { useSelector } from 'react-redux';
+
 
 export default function TodoScreen() {
 
@@ -159,10 +164,12 @@ export default function TodoScreen() {
                   onChange={(e) => setNewLabel(e.nativeEvent.text)}
                 />
               }
-              <YStack gap="$2" width="$4">
+              <YStack
+                gap="$2"
+                width={Platform.OS !== 'web' ? "$4" : undefined}
+              >
                 {chosenTodo && (
                   <Button
-                    color="$b"
                     icon={<X size="$1" />}
                     onPress={cancelEdit}
                   />
