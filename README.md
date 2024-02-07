@@ -1,1 +1,9 @@
-note because this is in a monorepo had to remove react, react-dom, and react-native-web deps and change metro.config.js a bit.
+To install dependencies:
+```sh
+yarn install
+```
+
+To run (and then choose your desired platform):
+```sh
+yarn start
+```
