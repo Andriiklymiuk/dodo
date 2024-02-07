@@ -1,9 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { TodoItem } from './reducer';
+import { TodoItem } from './types';
 
 export const todosApi = createApi({
   reducerPath: 'todosApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:65535' }),
+  baseQuery: fetchBaseQuery({ baseUrl: process.env.EXPO_PUBLIC_TODO_URL }),
   tagTypes: ['Todo'],
   endpoints: (builder) => ({
     getTodos: builder.query<TodoItem[], void>({
@@ -21,6 +21,13 @@ export const todosApi = createApi({
         url: 'todos',
         method: 'POST',
         body: newTodo,
+      }),
+      invalidatesTags: [{ type: 'Todo', id: 'LIST' }],
+    }),
+    toggleTodo: builder.mutation<TodoItem, string>({
+      query: (todoId) => ({
+        url: `todos/${todoId}/toggle`,
+        method: 'PATCH',
       }),
       invalidatesTags: [{ type: 'Todo', id: 'LIST' }],
     }),
@@ -42,4 +49,10 @@ export const todosApi = createApi({
   }),
 });
 
-export const { useGetTodosQuery, usePostTodoMutation, useUpdateTodoMutation, useDeleteTodoMutation } = todosApi;
+export const {
+  useGetTodosQuery,
+  usePostTodoMutation,
+  useUpdateTodoMutation,
+  useDeleteTodoMutation,
+  useToggleTodoMutation
+} = todosApi;

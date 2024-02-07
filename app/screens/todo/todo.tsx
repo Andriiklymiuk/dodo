@@ -16,19 +16,31 @@ import {
   Label,
   TextArea,
 } from 'tamagui';
-import { Check, Plus, X } from '@tamagui/lucide-icons';
+import {
+  Check,
+  FileEdit,
+  Plus,
+  ToggleLeft,
+  ToggleRight,
+  Trash,
+  X
+} from '@tamagui/lucide-icons';
 import TodoWithLabel from './components/TodoWithLabel';
-import { TodoItem, addTodo, removeTodo, toggleTodo, updateTodo } from './reducer';
+import { todosApi, useDeleteTodoMutation, useGetTodosQuery, usePostTodoMutation, useToggleTodoMutation, useUpdateTodoMutation } from './api';
+import { TodoItem } from './types';
 import { RootState } from '../../services/store';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 export default function TodoScreen() {
-  const dispatch = useDispatch();
 
   const [newLabel, setNewLabel] = useState('');
   const [isSheetVisible, setIsSheetVisible] = useState(false);
   const [chosenTodo, setChosenTodo] = useState<TodoItem | undefined>(undefined);
-  const todos = useSelector((state: RootState) => state.todos.todos);
+  const { data: todos = [], error, isLoading } = useGetTodosQuery();
+  const [postTodo] = usePostTodoMutation();
+  const [deleteTodo] = useDeleteTodoMutation();
+  const [updateTodo] = useUpdateTodoMutation();
+  const [toggleTodo] = useToggleTodoMutation();
 
   const closeSheet = () => {
     setIsSheetVisible(false);
@@ -56,18 +68,18 @@ export default function TodoScreen() {
     setNewLabel('');
   }
 
-  const onDeleteTodo = (id: string) => {
-    dispatch(removeTodo(id));
+  const onDeleteTodo = async (id: string) => {
+    await deleteTodo(id).unwrap().catch((e) => console.error(e));
     closeSheet();
   };
 
-  const onSubmitTodo = () => {
+  const onSubmitTodo = async () => {
     if (newLabel.trim() === '') return;
     if (chosenTodo) {
-      dispatch(updateTodo({
+      updateTodo({
         id: chosenTodo.id,
         label: newLabel
-      }));
+      }).unwrap();
       closeEdit();
       return;
     }
@@ -76,9 +88,8 @@ export default function TodoScreen() {
       id: Date.now().toString(),
       label: newLabel,
       checked: false,
-      disabled: false,
     };
-    dispatch(addTodo(newTodo))
+    await postTodo(newTodo).unwrap();
     setNewLabel('');
   };
 
@@ -87,8 +98,11 @@ export default function TodoScreen() {
     setChosenTodo(undefined);
   };
 
-  const onCheckPressed = (id: string) => {
-    dispatch(toggleTodo(id));
+  const onCheckPressed = async (id: string) => {
+    await toggleTodo(id).unwrap();
+    if (chosenTodo && chosenTodo.id === id) {
+      setChosenTodo(todo => ({ ...chosenTodo, checked: !todo?.checked }));
+    }
   }
 
   const renderTodo = ({ item }: { item: any }) => (
@@ -97,7 +111,6 @@ export default function TodoScreen() {
       label={item.label}
       checked={item.checked}
       defaultChecked={item.checked}
-      disabled={item.disabled}
       onModalPressed={openSheet}
       onCheckPressed={onCheckPressed}
     />
@@ -190,9 +203,36 @@ export default function TodoScreen() {
                   alignSelf='center'
                 >
                   <Label size="$4">{chosenTodo.label}</Label>
-                  <Button size="$4" onPress={onEditTodo}>Edit</Button>
-                  <Button size="$4" onPress={() => onDeleteTodo(chosenTodo.id)}>Delete</Button>
-                  <Button theme="red" size="$4" onPress={closeSheet}>Cancel</Button>
+                  {Platform.OS === 'web' &&
+                    <Button
+                      size="$4"
+                      iconAfter={chosenTodo.checked ? <ToggleRight size="$1" /> : <ToggleLeft size="$1" />}
+                      onPress={() => onCheckPressed(chosenTodo.id)}
+                    >
+                      Toggle
+                    </Button>
+                  }
+                  <Button
+                    size="$4"
+                    iconAfter={<FileEdit size="$1" />}
+                    onPress={onEditTodo}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="$4"
+                    theme="red"
+                    iconAfter={<Trash size="$1" />}
+                    onPress={() => onDeleteTodo(chosenTodo.id)}>
+                    Delete
+                  </Button>
+                  <Button
+                    size="$4"
+                    iconAfter={<X size="$1" />}
+                    onPress={closeSheet}
+                  >
+                    Cancel
+                  </Button>
                 </YStack>
               </Sheet.Frame>
             </Sheet>

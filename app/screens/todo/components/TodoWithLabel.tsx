@@ -1,6 +1,7 @@
 import React from 'react';
 import { Check } from '@tamagui/lucide-icons';
 import { Checkbox, CheckboxProps, Label, SizeTokens, XStack, } from 'tamagui';
+import { Platform } from 'react-native';
 
 const TodoWithLabel = ({
   id,
@@ -15,15 +16,26 @@ const TodoWithLabel = ({
   onModalPressed: (id: any) => void;
   onCheckPressed: (id: any) => void;
 }) => {
+  const onPress = () => {
+    if (Platform.OS == 'web') {
+      onModalPressed(id)
+      return
+    }
+    onCheckPressed(id)
+  }
+
+  const onLongPress = () => {
+    onModalPressed(id)
+  }
 
   return (
     <XStack width={300} alignItems="center" space="$4"
-      onLongPress={() => onModalPressed(id)}
-      onPress={() => onCheckPressed(id)}
+      onLongPress={() => onLongPress()}
+      onPress={() => onPress()}
     >
       <Checkbox
         {...checkboxProps}
-        onCheckedChange={() => onCheckPressed(id)}
+        onCheckedChange={() => onPress()}
       >
         <Checkbox.Indicator>
           <Check />
@@ -32,8 +44,8 @@ const TodoWithLabel = ({
       <Label
         size="$4"
         numberOfLines={2}
-        onLongPress={() => onModalPressed(id)}
-        onPress={() => onCheckPressed(id)}
+        onLongPress={() => onLongPress()}
+        onPress={() => onPress()}
       >
         {label}
       </Label>
