@@ -1,17 +1,66 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { TodoItem } from './types';
 import { Platform } from 'react-native';
+import { PatchCollection, Recipe } from '@reduxjs/toolkit/dist/query/core/buildThunks';
 
+import { TodoItem } from './types';
 
+const normalizeEnv = (env: string | undefined) => {
+  if (env && env.includes('localhost') && Platform.OS === 'android') {
+    return env.replace('localhost', '10.0.2.2')
+  }
+  return env || ''
+}
+
+const processWebsocketEvents = (ws: WebSocket, updateCachedData: (updateRecipe: Recipe<TodoItem[]>) => PatchCollection) => {
+  const listener = (event: MessageEvent) => {
+
+    const eventData = JSON.parse(event.data)
+    const { action, data } = eventData
+    switch (action) {
+      case 'updateTodo':
+        updateCachedData((draft) => {
+          const index = draft.findIndex((d) => d.id === data.id)
+          if (index !== -1) {
+            draft[index] = data
+          }
+        })
+        break
+      case 'deleteTodo':
+        updateCachedData((draft) => {
+          const index = draft.findIndex((d) => d.id === data.id)
+          if (index !== -1) {
+            draft.splice(index, 1)
+          }
+        })
+        break
+      case 'toggleTodo':
+        updateCachedData((draft) => {
+          const index = draft.findIndex((d) => d.id === data.id)
+          if (index !== -1) {
+            draft[index].checked = !draft[index].checked
+          }
+        })
+        break
+      case 'postTodo':
+        updateCachedData((draft) => {
+          draft.push(data)
+        })
+        break
+
+      default:
+        break
+    }
+  }
+
+  ws.addEventListener('message', listener)
+}
 
 export const todosApi = createApi({
   reducerPath: 'todosApi',
   // this is done for testing only
   baseQuery: fetchBaseQuery({
     baseUrl:
-      Platform.OS === 'android' ?
-        process.env.EXPO_PUBLIC_TODO_ANDROID_URL :
-        process.env.EXPO_PUBLIC_TODO_URL
+      normalizeEnv(process.env.EXPO_PUBLIC_TODO_URL)
   }),
   tagTypes: ['Todo'],
   endpoints: (builder) => ({
@@ -24,6 +73,23 @@ export const todosApi = createApi({
             { type: 'Todo', id: 'LIST' },
           ]
           : [{ type: 'Todo', id: 'LIST' }],
+      async onCacheEntryAdded(
+        arg,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
+      ) {
+        const ws = new WebSocket(
+          normalizeEnv(process.env.EXPO_PUBLIC_TODO_WEBSOCKET_URL)
+        )
+        try {
+          await cacheDataLoaded
+          processWebsocketEvents(ws, updateCachedData);
+        } catch {
+          console.log('something went wrong with the websocket connection')
+        }
+
+        await cacheEntryRemoved
+        ws.close()
+      },
     }),
     postTodo: builder.mutation<TodoItem, Partial<TodoItem>>({
       query: (newTodo) => ({
