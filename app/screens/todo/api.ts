@@ -1,9 +1,18 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { TodoItem } from './types';
+import { Platform } from 'react-native';
+
+
 
 export const todosApi = createApi({
   reducerPath: 'todosApi',
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.EXPO_PUBLIC_TODO_URL }),
+  // this is done for testing only
+  baseQuery: fetchBaseQuery({
+    baseUrl:
+      Platform.OS === 'android' ?
+        process.env.EXPO_PUBLIC_TODO_ANDROID_URL :
+        process.env.EXPO_PUBLIC_TODO_URL
+  }),
   tagTypes: ['Todo'],
   endpoints: (builder) => ({
     getTodos: builder.query<TodoItem[], void>({

@@ -8,6 +8,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "startAll": "expo start --web --android --ios",
     "test": "jest --watchAll"
   },
   "jest": {
@@ -17,18 +18,18 @@
     "@expo/metro-runtime": "3.1.1",
     "@react-navigation/native": "^6.0.2",
     "@reduxjs/toolkit": "^2.1.0",
-    "@tamagui/config": "^1.89.3",
-    "@tamagui/lucide-icons": "^1.89.3",
-    "@tamagui/metro-plugin": "^1.89.3",
+    "@tamagui/config": "^1.89.11",
+    "@tamagui/lucide-icons": "^1.89.11",
+    "@tamagui/metro-plugin": "^1.89.11",
     "babel-preset-expo": "^10.0.1",
-    "expo": "50.0.5",
+    "expo": "50.0.2",
     "expo-font": "~11.10.2",
     "expo-linking": "~6.2.1",
-    "expo-router": "~3.4.6",
-    "expo-splash-screen": "~0.26.4",
+    "expo-router": "~3.4.4",
+    "expo-splash-screen": "~0.26.3",
     "expo-status-bar": "~1.11.1",
     "expo-system-ui": "~2.9.3",
-    "expo-web-browser": "~12.8.2",
+    "expo-web-browser": "~12.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet-async": "~2.0.4",
@@ -38,7 +39,8 @@
     "react-native-svg": "^14.1.0",
     "react-native-web": "^0.19.9",
     "react-redux": "^9.1.0",
-    "tamagui": "^1.89.3"
+    "tamagui": "^1.89.11",
+    "typescript": "^5.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.3",
